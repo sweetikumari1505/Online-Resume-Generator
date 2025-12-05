@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Resume Generator — 4 Templates</title>
+
+<!-- html2pdf -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+
+<style>
+  /* Global layout */
+  :root{
+    --accent:#2b7cff;
+    --muted:#6b7280;
+    --card:#ffffff;
+    --bg:#f6f8fb;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background:var(--bg);
+    color:#111;
+    padding:18px;
+  }
+  h1{margin:0 0 14px 0;font-size:20px}
+  .app {
+    display:grid;
+    grid-template-columns: 360px 1fr;
+    gap:18px;
+    align-items:start;
+  }
+  /* LEFT: FORM */
+  .panel {
+    background:white;
+    padding:14px;
+    border-radius:10px;
+    box-shadow:0 6px 18px rgba(10,20,40,0.06);
+    max-height:85vh;
+    overflow:auto;
+  }
+
+  label{display:block;font-size:13px;color:var(--muted);margin-top:10px}
+  input[type="text"], input[type="email"], input[type="tel"], textarea, select {
+    width:100%;
+    padding:8px 10px;
+    margin-top:6px;
+    border-radius:8px;
+    border:1px solid #e6e9ef;
+    font-size:14px;
+    background:#fff;
+  }
+  textarea{min-height:70px;resize:vertical}
+  .row{display:flex;gap:8px}
+  .col{flex:1}
+  .small{font-size:13px;color:var(--muted)}
+  .controls{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .btn{background:var(--accent);color:white;padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
+  .btn.secondary{background:#fff;color:var(--accent);border:1px solid #dbeafe}
+
+  /* RIGHT: Preview area */
+  .preview-column{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .preview {
+    background:white;
+    padding:18px;
+    border-radius:10px;
+    box-shadow:0 6px 18px rgba(10,20,40,0.04);
+    min-height:250px;
+  }
+
+  /* Template container common sizing for PDF */
+  .resume-wrapper { max-width:800px; margin:0 auto; }
+
+  /* ===========================
+     Template A: Navy Header (Amanda style)
+     =========================== */
+  .tpl-a {
+    font-family: "Georgia", serif;
+    color:#222;
+  }
+  .tpl-a .header {
+    background:#0b2540;
+    color:white;
+    padding:18px;
+    display:flex;
+    gap:16px;
+    align-items:center;
+    border-radius:8px 8px 0 0;
+  }
+  .tpl-a .avatar-a {
+    width:78px;height:78px;border-radius:8px;overflow:hidden;background:#fff;flex-shrink:0;
+  }
+  .tpl-a .name-a { font-size:22px;font-weight:800; letter-spacing:1px; margin:0; }
+  .tpl-a .role-a { font-size:12px;color:#cfe2ff;margin-top:4px; }
+
+  .tpl-a .content { padding:16px; background:#fff; border-radius:0 0 8px 8px; }
+  .tpl-a .two { display:flex; gap:18px; }
+  .tpl-a .leftcol { width:260px; }
+  .tpl-a .section-title { font-weight:700; color:#0b2540; margin-top:6px; margin-bottom:6px; }
+
+  /* ===========================
+     Template B: Blue Sidebar (Lorna style)
+     =========================== */
+  .tpl-b { font-family: Arial, sans-serif; color:#111; display:flex; }
+  .tpl-b .sidebar { width:220px; background:linear-gradient(180deg,#e8f5ff,#dbeeff); padding:18px; border-radius:8px 0 0 8px; }
+  .tpl-b .main { padding:18px; flex:1; background:white; border-radius:0 8px 8px 0; }
+  .tpl-b .avatar-b { width:90px;height:90px;border-radius:50%;overflow:hidden;margin-bottom:8px; border:4px solid white;}
+  .tpl-b .s-title { font-weight:700; color:#0b66d1; margin-bottom:6px; }
+
+  /* ===========================
+     Template C: Grey Sidebar (Radhika style)
+     =========================== */
+  .tpl-c { display:flex; gap:14px; font-family: "Segoe UI", Tahoma, sans-serif; color:#222; }
+  .tpl-c .leftc { width:220px; background:#f3f4f6;padding:16px;border-radius:8px; }
+  .tpl-c .rightc { flex:1;background:white;padding:18px;border-radius:8px; }
+  .tpl-c .name-c { font-size:20px;font-weight:800; color:#2b2b2b; }
+
+  /* ===========================
+     Template D: Light Student template (light-blue)
+     =========================== */
+  .tpl-d { font-family: Arial, sans-serif; color:#111; }
+  .tpl-d .top { display:flex; gap:14px; align-items:center; background:linear-gradient(90deg,#e8f6ff,#f8fbff); padding:12px;border-radius:8px; }
+  .tpl-d .leftd { width:200px; }
+  .tpl-d .rightd { flex:1;padding-left:12px; }
+
+  /* Shared small styles for sections */
+  .section { margin-top:10px; margin-bottom:8px; }
+  .section h4 { margin:0 0 6px 0; font-size:14px; color:var(--accent); }
+  .muted { color:var(--muted); font-size:13px; }
+
+  /* responsive */
+  @media (max-width:1000px){
+    .app { grid-template-columns: 1fr; }
+    .tpl-b .sidebar { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Resume Generator — 4 Templates</h1>
+
+<div style="display:flex;gap:8px;margin-bottom:12px">
+  <button class="btn" onclick="generatePreview()">Update Preview</button>
+  <button class="btn secondary" onclick="downloadPDF()">Download PDF</button>
+  <button class="btn secondary" id="viewSampleBtn">View sample resume</button>
+  <select id="templateSelect" style="margin-left:auto;padding:8px 10px;border-radius:8px;border:1px solid #e6e9ef">
+    <option value="a">Template A — Navy Header</option>
+    <option value="b">Template B — Blue Sidebar</option>
+    <option value="c">Template C — Grey Sidebar</option>
+    <option value="d">Template D — Light Student</option>
+  </select>
+</div>
+
+<div class="app">
+  <!-- LEFT: form -->
+  <div class="panel" id="formPanel">
+    <div style="display:flex;gap:10px;align-items:center;">
+      <div style="flex:1"><strong>Fill your details</strong><div class="small">All templates use same fields</div></div>
+      <div>
+        <input type="file" id="photoInput" accept="image/*" style="display:none" />
+        <button class="btn secondary" onclick="document.getElementById('photoInput').click()">Upload Photo</button>
+      </div>
+    </div>
+
+    <label>Full name</label>
+    <input id="name" type="text" placeholder="Amanda Joseph">
+
+    <label>Profession / Title</label>
+    <input id="title" type="text" placeholder="Product Manager">
+
+    <div class="row">
+      <div class="col">
+        <label>Email</label>
+        <input id="email" type="email" placeholder="you@example.com">
+      </div>
+      <div class="col">
+        <label>Phone</label>
+        <input id="phone" type="tel" placeholder="+91 99999 99999">
+      </div>
+    </div>
+
+    <label>Address</label>
+    <input id="address" type="text" placeholder="City, State, Country">
+
+    <label>Professional summary</label>
+    <textarea id="summary" placeholder="Short 2-4 line summary"></textarea>
+
+    <label>Education (one per line)</label>
+    <textarea id="education" placeholder="Degree — Institution — Year"></textarea>
+
+    <label>Work experience (entries separated by blank line)</label>
+    <textarea id="work" placeholder="Title — Company — Dates\n• Achievement"></textarea>
+
+    <label>Internships (optional)</label>
+    <textarea id="intern" placeholder="Intern — Org — Dates"></textarea>
+
+    <label>Skills (comma separated)</label>
+    <input id="skills" type="text" placeholder="JavaScript, Java, React">
+
+    <label>Certifications</label>
+    <textarea id="certs"></textarea>
+
+    <label>Projects</label>
+    <textarea id="projects"></textarea>
+
+    <label>Languages</label>
+    <input id="languages" type="text" placeholder="English, Hindi">
+
+    <label>Interests</label>
+    <input id="interests" type="text" placeholder="Reading, Travelling">
+
+    <div class="divider" style="height:1px;background:#eef2ff;margin:12px 0"></div>
+
+    <label>PDF filename</label>
+    <input id="pdfName" type="text" value="resume.pdf">
+
+    <div class="row">
+      <div class="col">
+        <label>Page size</label>
+        <select id="pdfSize">
+          <option value="a4">A4</option>
+          <option value="letter">Letter</option>
+        </select>
+      </div>
+      <div class="col">
+        <label>Orientation</label>
+        <select id="pdfOrientation">
+          <option value="portrait">Portrait</option>
+          <option value="landscape">Landscape</option>
+        </select>
+      </div>
+    </div>
+
+    <label style="margin-top:8px"><input type="checkbox" id="highRes"> High resolution PDF</label>
+
+    <div class="controls" style="margin-top:12px">
+      <button class="btn" onclick="generateAndDownload()">Generate & Download</button>
+      <button class="btn secondary" onclick="resetForm()">Reset</button>
+      <button class="btn secondary" id="saveBtn">Save</button>
+      <button class="btn secondary" id="loadBtn">Load</button>
+    </div>
+
+    <p class="small" style="margin-top:8px">Tip: Press <strong>Update Preview</strong> after editing or switch template using the dropdown on top.</p>
+  </div>
+
+  <!-- RIGHT: preview -->
+  <div class="preview-column">
+    <div class="preview" id="previewArea">
+      <!-- dynamic preview inserted here -->
+    </div>
+
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" onclick="downloadPDF()">Download PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- Embedded sample resume viewer modal-like area (uses uploaded file path) -->
+<div id="sampleViewer" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;">
+  <div style="width:90%;max-width:1000px;background:white;padding:12px;border-radius:8px;position:relative;">
+    <button style="position:absolute;right:10px;top:10px;padding:6px 10px;border-radius:6px" onclick="toggleSample()">Close</button>
+    <div style="height:80vh;overflow:auto">
+      <!-- Use the real path to uploaded sample PDF -->
+      <iframe src="/mnt/data/ResumeSagufta1.pdf" style="width:100%;height:100%;border:none;"></iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===========================
+   Simple state & helpers
+   =========================== */
+
+const samplePath = "/mnt/data/ResumeSagufta1.pdf"; // uploaded sample file (see: :contentReference[oaicite:2]{index=2})
+
+/* form fields to save/load */
+const FIELDS = ["name","title","email","phone","address","summary","education","work","intern","skills","certs","projects","languages","interests","pdfName","pdfSize","pdfOrientation","highRes"];
+
+function q(id){ return document.getElementById(id); }
+
+/* auto-save handlers */
+function saveToLocal(){
+  const data = {};
+  FIELDS.forEach(f => {
+    const el = q(f);
+    if(!el) return;
+    if(el.type === "checkbox") data[f] = el.checked;
+    else data[f] = el.value;
+  });
+  // photo is stored as data URL (if exists)
+  if(window._photoData) data["_photo"] = window._photoData;
+  localStorage.setItem("resume_v4", JSON.stringify(data));
+}
+function loadFromLocal(){
+  const raw = localStorage.getItem("resume_v4");
+  if(!raw) return false;
+  try{
+    const data = JSON.parse(raw);
+    FIELDS.forEach(f=>{
+      const el = q(f);
+      if(!el || data[f] === undefined) return;
+      if(el.type === "checkbox") el.checked = data[f];
+      else el.value = data[f];
+    });
+    if(data["_photo"]){
+      window._photoData = data["_photo"];
+    }
+    return true;
+  }catch(e){ return false; }
+}
+
+/* Attach save button */
+q("saveBtn").addEventListener("click", () => { saveToLocal(); alert("Saved locally."); });
+q("loadBtn").addEventListener("click", () => { if(loadFromLocal()){ generatePreview(); alert("Loaded."); } else alert("No saved data."); });
+
+/* Photo upload preview */
+q("photoInput").addEventListener("change", (ev)=>{
+  const f = ev.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = ()=> {
+    window._photoData = reader.result; // data URL
+    generatePreview();
+    saveToLocal();
+  };
+  reader.readAsDataURL(f);
+});
+
+/* Toggle sample viewer */
+function toggleSample(){
+  const v = q("sampleViewer");
+  if(v.style.display === "flex") v.style.display = "none";
+  else v.style.display = "flex";
+}
+q("viewSampleBtn").addEventListener("click", toggleSample);
+
+/* Escape HTML & newlines */
+function escapeHtml(s){
+  if(!s) return "";
+  return s.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll("\n","<br>");
+}
+
+/* Build preview for each template */
+function buildTemplateA(data){
+  // Navy header — two column layout
+  return `
+  <div class="resume-wrapper tpl-a" id="tplA">
+    <div class="header">
+      <div class="avatar-a">${ data.photo ? `<img src="${data.photo}" style="width:78px;height:78px;object-fit:cover">` : '' }</div>
+      <div style="flex:1">
+        <div class="name-a">${escapeHtml(data.name)}</div>
+        <div class="role-a">${escapeHtml(data.title)}</div>
+        <div class="muted">${escapeHtml(data.email)} · ${escapeHtml(data.phone)} · ${escapeHtml(data.address)}</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="two">
+        <div class="leftcol">
+          <div class="section">
+            <div class="section-title">Education</div>
+            <div class="muted">${escapeHtml(data.education)}</div>
+          </div>
+          <div class="section">
+            <div class="section-title">Skills</div>
+            <div class="muted">${escapeHtml(data.skills)}</div>
+          </div>
+          <div class="section">
+            <div class="section-title">Certifications</div>
+            <div class="muted">${escapeHtml(data.certs)}</div>
+          </div>
+        </div>
+
+        <div style="flex:1">
+          <div class="section">
+            <div class="section-title">Professional Summary</div>
+            <div class="muted">${escapeHtml(data.summary)}</div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Work Experience</div>
+            <div class="muted">${escapeHtml(data.work)}</div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Projects</div>
+            <div class="muted">${escapeHtml(data.projects)}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+function buildTemplateB(data){
+  // Blue sidebar — image left on sidebar
+  return `
+  <div class="resume-wrapper tpl-b" id="tplB" style="display:flex">
+    <div class="sidebar">
+      <div style="text-align:center">
+        ${ data.photo ? `<img src="${data.photo}" class="avatar-b">` : `<div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#9ccfff,#4b9df6);display:inline-block"></div>` }
+      </div>
+      <h3 style="margin:10px 0 6px 0">${escapeHtml(data.name)}</h3>
+      <div class="muted">${escapeHtml(data.title)}</div>
+      <div style="height:12px"></div>
+      <div class="s-title">Contact</div>
+      <div class="muted" style="font-size:13px">${escapeHtml(data.email)}<br>${escapeHtml(data.phone)}<br>${escapeHtml(data.address)}</div>
+
+      <div style="height:8px"></div>
+      <div class="s-title">Skills</div>
+      <div class="muted">${escapeHtml(data.skills)}</div>
+
+      <div style="height:8px"></div>
+      <div class="s-title">Languages</div>
+      <div class="muted">${escapeHtml(data.languages)}</div>
+    </div>
+
+    <div class="main">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2 style="margin:0">${escapeHtml(data.name)}</h2>
+          <div class="muted">${escapeHtml(data.title)}</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h4>Summary</h4>
+        <div class="muted">${escapeHtml(data.summary)}</div>
+      </div>
+
+      <div class="section">
+        <h4>Work Experience</h4>
+        <div class="muted">${escapeHtml(data.work)}</div>
+      </div>
+
+      <div class="section">
+        <h4>Education</h4>
+        <div class="muted">${escapeHtml(data.education)}</div>
+      </div>
+
+      <div class="section">
+        <h4>Projects</h4>
+        <div class="muted">${escapeHtml(data.projects)}</div>
+      </div>
+
+    </div>
+  </div>
+  `;
+}
+
+function buildTemplateC(data){
+  // Grey sidebar with clean right column
+  return `
+  <div class="resume-wrapper tpl-c" id="tplC">
+    <div class="leftc">
+      <div style="text-align:center">
+        ${ data.photo ? `<img src="${data.photo}" style="width:84px;height:84px;border-radius:8px;object-fit:cover;margin-bottom:8px">` : '' }
+        <div class="name-c">${escapeHtml(data.name)}</div>
+        <div class="muted" style="margin-bottom:8px">${escapeHtml(data.title)}</div>
+      </div>
+
+      <div class="section">
+        <h4>Contact</h4>
+        <div class="muted">${escapeHtml(data.email)}<br>${escapeHtml(data.phone)}<br>${escapeHtml(data.address)}</div>
+      </div>
+
+      <div class="section">
+        <h4>Skills</h4>
+        <div class="muted">${escapeHtml(data.skills)}</div>
+      </div>
+
+      <div class="section">
+        <h4>Languages</h4>
+        <div class="muted">${escapeHtml(data.languages)}</div>
+      </div>
+    </div>
+
+    <div class="rightc">
+      <div class="section">
+        <h4>Profile</h4>
+        <div class="muted">${escapeHtml(data.summary)}</div>
+      </div>
+
+      <div class="section">
+        <h4>Work Experience</h4>
+        <div class="muted">${escapeHtml(data.work)}</div>
+      </div>
+
+      <div class="section">
+        <h4>Education</h4>
+        <div class="muted">${escapeHtml(data.education)}</div>
+      </div>
+
+      <div class="section">
+        <h4>Projects</h4>
+        <div class="muted">${escapeHtml(data.projects)}</div>
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+function buildTemplateD(data){
+  // Light student template with left small column
+  return `
+  <div class="resume-wrapper tpl-d" id="tplD">
+    <div class="top">
+      <div style="display:flex;align-items:center;gap:12px">
+        ${ data.photo ? `<img src="${data.photo}" style="width:86px;height:86px;border-radius:8px;object-fit:cover">` : '' }
+        <div>
+          <div style="font-size:20px;font-weight:800">${escapeHtml(data.name)}</div>
+          <div class="muted">${escapeHtml(data.title)}</div>
+          <div style="height:8px"></div>
+          <div class="muted">${escapeHtml(data.email)} · ${escapeHtml(data.phone)}</div>
+          <div class="muted">${escapeHtml(data.address)}</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 2fr;gap:14px;margin-top:12px">
+      <div>
+        <div class="section">
+          <h4>Education</h4>
+          <div class="muted">${escapeHtml(data.education)}</div>
+        </div>
+
+        <div class="section">
+          <h4>Skills</h4>
+          <div class="muted">${escapeHtml(data.skills)}</div>
+        </div>
+
+        <div class="section">
+          <h4>Interests</h4>
+          <div class="muted">${escapeHtml(data.interests)}</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section">
+          <h4>Summary</h4>
+          <div class="muted">${escapeHtml(data.summary)}</div>
+        </div>
+
+        <div class="section">
+          <h4>Experience</h4>
+          <div class="muted">${escapeHtml(data.work)}</div>
+        </div>
+
+        <div class="section">
+          <h4>Internships</h4>
+          <div class="muted">${escapeHtml(data.intern)}</div>
+        </div>
+
+        <div class="section">
+          <h4>Projects</h4>
+          <div class="muted">${escapeHtml(data.projects)}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+/* Generate preview based on selected template */
+function generatePreview(){
+  const data = {
+    name: q("name").value.trim(),
+    title: q("title").value.trim(),
+    email: q("email").value.trim(),
+    phone: q("phone").value.trim(),
+    address: q("address").value.trim(),
+    summary: q("summary").value.trim(),
+    education: q("education").value.trim(),
+    work: q("work").value.trim(),
+    intern: q("intern").value.trim(),
+    skills: q("skills").value.trim(),
+    certs: q("certs").value.trim(),
+    projects: q("projects").value.trim(),
+    languages: q("languages").value.trim(),
+    interests: q("interests").value.trim(),
+    photo: window._photoData || null
+  };
+
+  const tpl = q("templateSelect").value;
+  let html = "";
+  if(tpl === "a") html = buildTemplateA(data);
+  else if(tpl === "b") html = buildTemplateB(data);
+  else if(tpl === "c") html = buildTemplateC(data);
+  else html = buildTemplateD(data);
+
+  q("previewArea").innerHTML = html;
+  saveToLocal(); // keep curr state
+}
+
+/* PDF generation for visible template */
+function downloadPDF(){
+  // ensure preview up-to-date
+  generatePreview();
+
+  const filename = q("pdfName").value || "resume";
+  const pageSize = q("pdfSize").value || "a4";
+  const orientation = q("pdfOrientation").value || "portrait";
+  const highRes = q("highRes").checked;
+
+  const options = {
+    margin: 10,
+    filename: filename.endsWith(".pdf") ? filename : (filename + ".pdf"),
+    image: { type: "jpeg", quality: highRes ? 1 : 0.95 },
+    html2canvas: { scale: highRes ? 3 : 2, useCORS:true, allowTaint:true },
+    jsPDF: { unit: "mm", format: pageSize, orientation: orientation }
+  };
+
+  // choose the element we just injected — previewArea's first child (the resume-wrapper)
+  const el = q("previewArea").firstElementChild;
+  if(!el){
+    alert("Nothing to export. Click Update Preview first.");
+    return;
+  }
+
+  // visual feedback
+  const prevBtn = document.querySelector('button[onclick="downloadPDF()"]');
+  if(prevBtn){ prevBtn.disabled = true; prevBtn.textContent = "Preparing..." }
+
+  html2pdf().set(options).from(el).save().finally(()=>{
+    if(prevBtn){ prevBtn.disabled = false; prevBtn.textContent = "Download PDF" }
+  });
+}
+
+function generateAndDownload(){
+  generatePreview();
+  setTimeout(downloadPDF, 200);
+}
+
+/* Reset */
+function resetForm(){
+  if(!confirm("Reset all fields?")) return;
+  FIELDS.forEach(f=>{ const el=q(f); if(!el) return; if(el.type==="checkbox") el.checked=false; else el.value="";});
+  window._photoData = null;
+  localStorage.removeItem("resume_v4");
+  generatePreview();
+}
+
+/* Initialization */
+window.addEventListener("load", ()=>{
+  // try load saved data
+  if(loadFromLocal()) console.log("Loaded saved data");
+  generatePreview();
+  // wire keyboard save
+  document.addEventListener("keydown", (e)=>{
+    if((e.ctrlKey||e.metaKey) && e.key === "s"){ e.preventDefault(); saveToLocal(); alert("Saved"); }
+  });
+});
+
+/* store photo data url when set by file reader in photoInput area (handled above) */
+/* ensure any change triggers save */
+document.querySelectorAll("input,textarea,select").forEach(el=>{
+  el.addEventListener("input", ()=>{ saveToLocal(); });
+});
+</script>
+
+</body>
+</html>
